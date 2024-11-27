@@ -1,0 +1,75 @@
+def encode_image(image_path, message, output_path):
+    """Hide a secret message inside an image by modifying the least significant bit."""
+    # Convert the message into binary (8-bits per character)
+    binary_message = ''.join(format(ord(c), '08b') for c in message) + '11111111'  # Add stop signal
+
+    # Read the image file as binary data
+    with open(image_path, 'rb') as img_file:
+        img_data = bytearray(img_file.read())
+
+    message_index = 0
+    for i in range(len(img_data)):
+        if message_index < len(binary_message):
+            # Modify the LSB (least significant bit) to hide the message bit
+            img_data[i] = (img_data[i] & 0xFE) | int(binary_message[message_index])
+            message_index += 1
+        else:
+            break
+    
+    # Save the new image with the hidden message
+    with open(output_path, 'wb') as output_img:
+        output_img.write(img_data)
+    print(f"Message hidden successfully in {output_path}.")
+
+    def decode_image(image_path):
+        """Extract the hidden message from an image."""
+        # Read the image file as binary data
+        with open(image_path, 'rb') as img_file:
+            img_data = bytearray(img_file.read())
+    
+        binary_message = ''
+    for byte in img_data:
+        # Extract the least significant bit (LSB) from each byte
+        binary_message += str(byte & 1)
+    
+    # Find the stop signal and get the message
+    stop_signal = '11111111'
+    end_index = binary_message.find(stop_signal)
+    if end_index == -1:
+        print("No hidden message found.")
+        return None
+    
+    # Convert the binary message back to text
+    binary_message = binary_message[:end_index]
+    message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
+    return message
+
+def decode_image(image_path):
+    """Extract the hidden message from an image."""
+    # Read the image file as binary data
+    with open(image_path, 'rb') as img_file:
+        img_data = bytearray(img_file.read())
+    
+    binary_message = ''
+    for byte in img_data:
+        # Extract the least significant bit (LSB) from each byte
+        binary_message += str(byte & 1)
+    
+    # Find the stop signal and get the message
+    stop_signal = '11111111'
+    end_index = binary_message.find(stop_signal)
+    if end_index == -1:
+        print("No hidden message found.")
+        return None
+    
+    # Convert the binary message back to text
+    binary_message = binary_message[:end_index]
+    message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
+    return message
+
+# Hide a message in the image
+encode_image(r"C:\Users\conso\Documents\DAS\EF.JPEG", 'Bmw M5 E60 V10', 'encoded_image.png')
+
+# Extract the hidden message from the image
+decoded_message = decode_image('encoded_image.png')
+print(f"Decoded message: {decoded_message}")
