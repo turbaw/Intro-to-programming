@@ -16,7 +16,7 @@ def encode_image(image_path, message, output_path):
         else:
             break
     
-    # Save the new image with the hidden message
+    # Save the new image with the hidden messagge
     with open(output_path, 'wb') as output_img:
         output_img.write(img_data)
     print(f"Message hidden successfully in {output_path}.")
